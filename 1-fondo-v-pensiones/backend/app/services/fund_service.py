@@ -1,4 +1,5 @@
 from typing import Optional, Dict, Any, List
+from app.services.transaction_service import transaction_service
 
 class FundService:
     def __init__(self):
@@ -72,6 +73,14 @@ class FundService:
         }
         
         self.subscriptions.append(subscription)
+
+        # Crear transacción de suscripción
+        await transaction_service.add_transaction({
+            "type": "SUBSCRIPTION",
+            "fund_id": fund_id,
+            "amount": fund["monto_minimo"]
+        })
+
         return subscription
 
     async def unsubscribe(self, fund_id: int) -> Dict[str, Any]:
@@ -86,6 +95,14 @@ class FundService:
             raise ValueError(f"No existe una suscripción activa para el fondo con ID {fund_id}")
         
         self.subscriptions = [sub for sub in self.subscriptions if sub["fund_id"] != fund_id]
+
+        # Crear transacción de cancelación
+        await transaction_service.add_transaction({
+            "type": "CANCELLATION",
+            "fund_id": fund_id,
+            "amount": fund["monto_minimo"]
+        })
+
         return {
             "message": f"Suscripción al fondo {fund['nombre']} cancelada exitosamente",
             "fund_id": fund_id
