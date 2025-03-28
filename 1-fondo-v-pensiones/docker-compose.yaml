@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: fondos-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - AWS_REGION=us-east-1
+      - FUNDS_TABLE=Funds
+      - USER_FUNDS_TABLE=UserFunds
+      - TRANSACTIONS_TABLE=Transactions
+      - EMAIL_SENDER=noreply@example.com
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8001
+      - SNS_ENDPOINT=http://localstack:4566
+      - SES_ENDPOINT=http://localstack:4566
+    depends_on:
+      - dynamodb-local
+      - localstack
+    networks:
+      - fondos-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: fondos-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    networks:
+      - fondos-network
+
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: fondos-dynamodb
+    ports:
+      - "8001:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
+    networks:
+      - fondos-network
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: fondos-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sns,ses
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DISABLE_CORS_CHECKS=1
+      - SKIP_SSL_CERT_DOWNLOAD=1
+      - PERSISTENCE=0
+      - CLEAR_TMP_FOLDER=0
+      - LAMBDA_EXECUTOR=local
+    volumes:
+      - ./localstack-data:/tmp/localstack/data
+      # Opcional: si quieres usar funciones Lambda localmente
+      # - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - fondos-network
+
+networks:
+  fondos-network:
+    driver: bridge 
