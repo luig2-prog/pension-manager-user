@@ -46,16 +46,16 @@ export const AppProvider = ({ children }) => {
         const userFundsResponse = await fetch(`${API_URL}/api/funds/user`);
         if (!userFundsResponse.ok) {
           // Si el endpoint no existe o falla, usamos datos simulados
-          setUserFunds(prev => ({
-            ...prev,
+          setUserFunds({
+            balance: 500000,
             subscribed_funds: []
-          }));
+          });
         } else {
           const userData = await userFundsResponse.json();
-          setUserFunds(prev => ({
-            ...prev,
-            ...userData
-          }));
+          setUserFunds({
+            balance: userData.balance || 500000,
+            subscribed_funds: userData.subscribed_funds || []
+          });
         }
 
         // Fetch transactions
@@ -64,11 +64,12 @@ export const AppProvider = ({ children }) => {
           setTransactions([]);
         } else {
           const transactionData = await transactionsResponse.json();
-          setTransactions(transactionData);
+          setTransactions(Array.isArray(transactionData) ? transactionData : []);
         }
       } catch (err) {
         setError('Error cargando datos iniciales: ' + err.message);
         console.error('Error fetching initial data:', err);
+        setTransactions([]);
       } finally {
         setLoading(false);
       }
