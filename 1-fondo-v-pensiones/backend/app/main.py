@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
@@ -24,9 +24,9 @@ app.include_router(funds.router, prefix="/api/funds", tags=["funds"])
 app.include_router(transactions.router, prefix="/api/transactions", tags=["transactions"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 
-# AWS Lambda handler
-handler = Mangum(app)
-
 @app.get("/", tags=["health"])
 async def health_check():
-    return {"status": "healthy"} 
+    return {"status": "healthy"}
+
+# AWS Lambda handler
+handler = Mangum(app) 

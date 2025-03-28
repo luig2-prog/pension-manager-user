@@ -1,11 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from typing import List
 
 from app.api.models.fund import FundModel
 from app.api.schemas.fund import (
-    FundBase, 
-    UserFunds, 
-    FundSubscriptionRequest, 
+    Fund,
+    UserFunds,
+    FundSubscriptionRequest,
     FundSubscriptionResponse,
     FundCancellationRequest,
     FundCancellationResponse
@@ -13,17 +13,27 @@ from app.api.schemas.fund import (
 
 router = APIRouter()
 
-@router.get("/", response_model=List[FundBase])
-async def get_all_funds():
-    """Get all available funds"""
-    funds = await FundModel.get_all_funds()
-    return funds
+@router.get("/", response_model=List[Fund])
+async def read_funds():
+    """
+    Obtener todos los fondos disponibles
+    """
+    return await FundModel.get_all_funds()
 
 @router.get("/user", response_model=UserFunds)
 async def get_user_funds(user_id: str = "default_user"):
     """Get user's balance and subscribed funds"""
-    user_data = await FundModel.get_user_data(user_id)
-    return user_data
+    return await FundModel.get_user_funds(user_id)
+
+@router.get("/{fund_id}", response_model=Fund)
+async def read_fund(fund_id: int):
+    """
+    Obtener un fondo específico por su ID
+    """
+    fund = await FundModel.get_fund(fund_id)
+    if fund is None:
+        raise HTTPException(status_code=404, detail="Fondo no encontrado")
+    return fund
 
 @router.post("/subscribe", response_model=FundSubscriptionResponse)
 async def subscribe_to_fund(
@@ -31,11 +41,13 @@ async def subscribe_to_fund(
     user_id: str = "default_user"
 ):
     """Subscribe to a fund"""
-    result = await FundModel.subscribe_to_fund(user_id, subscription.fund_id)
-    if not result.get("success", False):
-        # Return 400 for client errors, but keep the detailed message
-        raise HTTPException(status_code=400, detail=result.get("message", "Error subscribing to fund"))
-    return result
+    try:
+        return await FundModel.subscribe_to_fund(
+            user_id=user_id,
+            fund_id=subscription.fund_id
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/unsubscribe", response_model=FundCancellationResponse)
 async def unsubscribe_from_fund(
@@ -43,8 +55,10 @@ async def unsubscribe_from_fund(
     user_id: str = "default_user"
 ):
     """Unsubscribe from a fund"""
-    result = await FundModel.unsubscribe_from_fund(user_id, cancellation.fund_id)
-    if not result.get("success", False):
-        # Return 400 for client errors, but keep the detailed message
-        raise HTTPException(status_code=400, detail=result.get("message", "Error unsubscribing from fund"))
-    return result 
+    try:
+        return await FundModel.unsubscribe_from_fund(
+            user_id=user_id,
+            fund_id=cancellation.fund_id
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) 

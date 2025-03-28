@@ -23,15 +23,15 @@ export const AppProvider = ({ children }) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Fetch available funds
         const funds = await fundService.getAllFunds();
         setAvailableFunds(funds);
-        
+
         // Fetch user funds and balance
         const userData = await fundService.getUserFunds();
         setUserFunds(userData);
-        
+
         // Fetch transactions
         const transactionData = await transactionService.getTransactions();
         setTransactions(transactionData);
@@ -51,21 +51,21 @@ export const AppProvider = ({ children }) => {
     try {
       setLoading(true);
       const result = await fundService.subscribeToFund(fundId);
-      
+
       // Refresh user funds and transactions
       const userData = await fundService.getUserFunds();
       setUserFunds(userData);
-      
+
       const transactionData = await transactionService.getTransactions();
       setTransactions(transactionData);
-      
+
       // Show success notification
       setNotification({
         show: true,
         message: result.message,
         type: 'success'
       });
-      
+
       return result;
     } catch (err) {
       setNotification({
@@ -84,21 +84,21 @@ export const AppProvider = ({ children }) => {
     try {
       setLoading(true);
       const result = await fundService.unsubscribeFromFund(fundId);
-      
+
       // Refresh user funds and transactions
       const userData = await fundService.getUserFunds();
       setUserFunds(userData);
-      
+
       const transactionData = await transactionService.getTransactions();
       setTransactions(transactionData);
-      
+
       // Show success notification
       setNotification({
         show: true,
         message: result.message,
         type: 'success'
       });
-      
+
       return result;
     } catch (err) {
       setNotification({
@@ -144,4 +144,4 @@ export const AppProvider = ({ children }) => {
       {children}
     </AppContext.Provider>
   );
-}; 
+};

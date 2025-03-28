@@ -3,30 +3,34 @@ from typing import List, Optional
 from datetime import datetime
 
 class FundBase(BaseModel):
-    id: str
-    name: str
-    min_amount: int
-    category: str
+    nombre: str
+    monto_minimo: float
+    categoria: str
+
+class Fund(FundBase):
+    id: int
+
+    class Config:
+        from_attributes = True
 
 class SubscribedFund(BaseModel):
     id: str
     name: str
     subscription_date: str
-    amount: int
+    amount: float
 
 class UserFunds(BaseModel):
-    user_id: str
-    balance: int
+    balance: float
     subscribed_funds: List[SubscribedFund]
 
 class FundSubscriptionRequest(BaseModel):
-    fund_id: str
+    fund_id: int
 
 class FundSubscriptionResponse(BaseModel):
     success: bool
     message: str
     transaction_id: Optional[str] = None
-    new_balance: Optional[int] = None
+    new_balance: Optional[float] = None
 
 class FundCancellationRequest(BaseModel):
     fund_id: str
@@ -35,4 +39,4 @@ class FundCancellationResponse(BaseModel):
     success: bool
     message: str
     transaction_id: Optional[str] = None
-    new_balance: Optional[int] = None 
+    new_balance: Optional[float] = None 

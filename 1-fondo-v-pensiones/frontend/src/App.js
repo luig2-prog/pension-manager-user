@@ -3,7 +3,7 @@ import { Container, CssBaseline, Box, Typography, Paper } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { AppProvider } from './contexts/AppContext';
 import Header from './components/Header';
-import FundList from './components/FundList';
+import FundsTable from './components/FundsTable';
 import UserFundList from './components/UserFundList';
 import TransactionHistory from './components/TransactionHistory';
 import Notification from './components/Notification';
@@ -36,7 +36,9 @@ const App = () => {
               Administre sus fondos de inversión y pensión voluntaria de manera fácil y eficiente.
             </Typography>
           </Box>
-          <FundList />
+          <Paper sx={{ p: 3, mb: 4 }}>
+            <FundsTable />
+          </Paper>
           <UserFundList />
           <TransactionHistory />
         </Container>

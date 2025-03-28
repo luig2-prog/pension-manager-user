@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getFunds, getFundById } from './fundService';
 
 // Set base URL based on environment
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -96,5 +97,22 @@ export const notificationService = {
       }
       throw error;
     }
+  },
+
+  // Get notifications
+  getNotifications: async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/notifications`);
+      if (!response.ok) {
+        throw new Error('Error al obtener las notificaciones');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
   }
-}; 
+};
+
+// Export fund service functions
+export { getFunds, getFundById }; 
