@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
-from app.api.routes import funds, transactions, notifications
+from app.routers import funds, transactions, notifications
 
 app = FastAPI(
     title="Fondos API",
@@ -20,9 +20,9 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(funds.router, prefix="/api/funds", tags=["funds"])
-app.include_router(transactions.router, prefix="/api/transactions", tags=["transactions"])
-app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
+app.include_router(funds.router)
+app.include_router(transactions.router)
+app.include_router(notifications.router)
 
 @app.get("/", tags=["health"])
 async def health_check():
