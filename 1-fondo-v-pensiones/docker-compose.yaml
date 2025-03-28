@@ -67,8 +67,6 @@ services:
       - LAMBDA_EXECUTOR=local
     volumes:
       - ./localstack-data:/tmp/localstack/data
-      # Opcional: si quieres usar funciones Lambda localmente
-      # - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - fondos-network
 
