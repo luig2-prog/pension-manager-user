@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from app.services.fund_service import fund_service
 from pydantic import BaseModel
+from typing import Dict, Any
 
 router = APIRouter(
     prefix="/api/funds",
@@ -30,6 +31,16 @@ async def subscribe_to_fund(subscription: SubscriptionRequest):
     """Suscribe un usuario a un fondo"""
     try:
         return await fund_service.subscribe(subscription.fund_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/unsubscribe")
+async def unsubscribe_from_fund(subscription: SubscriptionRequest):
+    """Cancela la suscripción de un usuario a un fondo"""
+    try:
+        return await fund_service.unsubscribe(subscription.fund_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:

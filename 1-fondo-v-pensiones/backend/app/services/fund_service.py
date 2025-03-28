@@ -74,4 +74,21 @@ class FundService:
         self.subscriptions.append(subscription)
         return subscription
 
+    async def unsubscribe(self, fund_id: int) -> Dict[str, Any]:
+        """Cancela la suscripción de un usuario a un fondo"""
+        fund = await self.get_fund(fund_id)
+        if not fund:
+            raise ValueError(f"Fondo con ID {fund_id} no encontrado")
+        
+        # Buscar y eliminar la suscripción
+        subscription = next((sub for sub in self.subscriptions if sub["fund_id"] == fund_id), None)
+        if not subscription:
+            raise ValueError(f"No existe una suscripción activa para el fondo con ID {fund_id}")
+        
+        self.subscriptions = [sub for sub in self.subscriptions if sub["fund_id"] != fund_id]
+        return {
+            "message": f"Suscripción al fondo {fund['nombre']} cancelada exitosamente",
+            "fund_id": fund_id
+        }
+
 fund_service = FundService() 
